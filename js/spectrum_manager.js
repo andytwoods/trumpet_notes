@@ -1,0 +1,4 @@
+
+function spectrum_manager(){
+
+}
