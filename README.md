@@ -18,5 +18,5 @@ can ping @andytwoods should any issues arise!
 
 ## Features in the pipeline
 - Spectrum analyser so the trumpet player can play a note and we can check whether it is correct. 
-- Backend (Django) to store progress.
-- More sophisicated spaced learning algorithms. 
+- Backend (Django) to store progress. 
+- More sophisticated spaced learning algorithms. 
