@@ -14,7 +14,7 @@ I built this app whilst isolating due to covid. To keep me keen, I've used 'old-
 
 ## How to contribute?
 All contributions are appreciated! To contribute, simply create a new branch with your contribution and raise a PR! You
-can ping @andywoods should any issues arize!
+can ping @andytwoods should any issues arize!
 
 ## Features in the pipeline
 - Spectrum analyser so the trumpet player can play a note and we can check whether it is correct. 
