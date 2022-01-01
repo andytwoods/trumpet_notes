@@ -1,4 +1,3 @@
-
 var sheet_width = 400;
 var sheet_height = 300;
 
@@ -37,7 +36,6 @@ function notation_manager() {
             // remove line that go though the stave
             bar.remove();
             note.remove();
-            console.log('remove');
             this.removed = true;
             return this;
         }
@@ -114,7 +112,7 @@ function notation_manager() {
             this.stave = new Vex.Flow.Stave(0, 0, this.width);
 
             // Add a clef and time signature.
-            this.stave.addClef("treble").addTimeSignature("4/4");
+            this.stave.addClef("treble");//.addTimeSignature("4/4");
 
             // Connect it to the rendering context and draw!
             this.stave.setContext(this.context).draw();
@@ -159,8 +157,7 @@ function notation_manager() {
     sheet.createSheet();
 
     function getNote(my_note) {
-        console.log(my_note)
-        if(!(typeof my_note === 'string' || my_note instanceof String)) my_note = 'b'
+        if (!(typeof my_note === 'string' || my_note instanceof String)) my_note = 'b'
         return new Note({
             keys: [my_note],
             clef: 'treble',
@@ -169,10 +166,14 @@ function notation_manager() {
     }
 
     var addNote = function (my_note) {
-
+        sheet.clearNotes();
         var notes = sheet.addNotes([getNote(my_note)]);
+        var modifier = 0;
+        if(my_note.indexOf('b') !== -1 || my_note.indexOf('#') !== -1){
+            modifier -= 15.5; // this will relate to fontsize in some fashion
+        }
         for (var i in notes) {
-            notes[i].setOffsetX(sheet_width*.5 - 80);
+            notes[i].setOffsetX(sheet_width * .5 - 55 + modifier);
         }
     }
 

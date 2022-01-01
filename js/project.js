@@ -1,46 +1,66 @@
 window.addEventListener("load", main);
 
 function main() {
+
     notation_manager();
     spectrum_manager();
 
-    var vocab, learn, learning_type;
+    var vocab, learn, elements;
+    elements = elements_manager();
 
-    function setup() {
-        vocab = generate_vocab(1, learning_type);
+    setup_learn_params(setup);
+
+    function setup(learning_type, learning_level) {
+        vocab = generate_vocab(learning_type, learning_level);
         learn = learn_manager(vocab);
         console.log('Started learning environment with learning style: ' + learning_type);
-        setup_elements();
+        run_trial();
     }
 
-    function set_learning_type() {
-        learning_type = $("input[name='learning_type']:checked").val();
-        console.log(learning_type,22)
-        if(!learn_type[learning_type]){
-            throw 'unknown learning type'
-        }
-    }
-
-    $("input[name='learning_type']").click(function(){
-        set_learning_type();
-        setup();
-    });
-
-    set_learning_type();
-    setup();
-    run_trial();
-
-    function run_trial() {
+    function run_trial(prev_trial) {
         var trial = learn.next();
+
+        // avoiding 2 identical trials in a row...
+        while(prev_trial && trial.word.id===prev_trial.word.id){
+            trial = learn.next();
+        }
+
         var word = trial.word;
-        var learn_type = word.learn_type;
         switch(trial.word.learn_type){
             case NAMES_TO_NOTES:
+                elements.display_requirements([]);
                 break;
             case NOTES_TO_NAMES:
+                elements.display_requirements([elements.SHEET_MUSIC, elements.NOTE_BUTTONS]);
                 addNote(word.note + '/' + word.octave);
+                elements.NOTE_BUTTONS.answer = function(response){
+                    elements.NOTE_BUTTONS.answer = undefined;
+                    var correct = word.note === response;
+                    var dur = correct? 800:1000;
+                    var col_class = correct?'correct-key':'wrong-key';
+                    elements.NOTE_BUTTONS.flare(word.note, col_class, dur, function(){
+                        trial.result(correct);
+                        run_trial(trial);
+                    });
+                }
+                break;
+            case NOTES_TO_VALVES:
+                elements.display_requirements([elements.SHEET_MUSIC, elements.VALVES]);
+                addNote(word.note + '/' + word.octave);
+                elements.VALVES.answer = function(response){
+                    elements.VALVES.answer = undefined;
+                    var correct = word.fingering === response;
+                    var dur = correct? 800:1000;
+                    var col_class = correct?'correct-key':'wrong-key';
+                    elements.VALVES.all_up();
+                    elements.VALVES.flare(word.fingering, col_class, dur, function(){
+                        trial.result(correct);
+                        run_trial(trial);
+                    });
+                }
                 break;
             case NOTES_TO_SOUND:
+                elements.display_requirements([elements.SHEET_MUSIC, ]);
                 break;
             default:
                 throw 'dont know this learn-type: ' + trial.word.learn_type;
