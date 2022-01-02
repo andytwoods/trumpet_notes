@@ -14,7 +14,8 @@ function elements_manager() {
 
         for (var note of notes) {
             var safe_note_id = get_id_safe_note(note);
-            $(notes_buttons).append('<button type="button" id="buttonnote_' + safe_note_id + '" class="btn btn-outline-primary note-buttons">'
+            $(notes_buttons).append('<button type="button" id="buttonnote_' + safe_note_id + '" ' +
+                'class="btn btn-outline-primary btn-lg note-buttons">'
                 + note + '</button>');
         }
 
@@ -57,58 +58,85 @@ function elements_manager() {
         var my_valves = ['1', '2', '3'];
 
         for (var valve of my_valves) {
-            $(valves).append('<button type="button" id="valve_' + valve + '" class="btn btn-outline-primary raised valve-buttons" data-bs-toggle="button" autocomplete="off">'
+            $(valves).append('<button type="button" id="valve_' + valve + '" class="btn btn-outline-primary raised valve-buttons ' +
+                'd-block d-md-inline-block" style="margin: 0 auto;" data-bs-toggle="button" autocomplete="off">'
                 + valve + '</button>');
         }
 
-        $(valves_container).append('<div class="text-center d-block mt-3"><button type="button" id="valves_selected" class="btn btn-outline-primary ' +
+        $(valves_container).append('<div class="text-center d-block mt-3"><button type="button" id="valves_selected" class="btn btn-outline-primary btn-lg ' +
             'raised">Answer</button></div>');
 
-        $(valves_container).append('<small class="text-center d-block mt-3">Press 1, 2 or 3 to select valves. Space to answer.</small>');
+        $(valves_container).append('<small class="text-center d-block mt-3">Press 1/2/3 or m/k/o to select valves. Space to answer.</small>');
 
-        $(document).keypress(function (event) {
+        $(document).on('keydown', key_downup);
+        $(document).on('keyup', key_downup);
+
+        function key_downup(event) {
             var pressed = event.which;
+
             var space = 32;
-            if ([space, 49, 50, 51].indexOf(pressed)===-1) return;
+            if ([space, 49, 50, 51, 109, 107, 111, 77, 75, 79].indexOf(pressed) === -1) return;
             event.preventDefault();
-            if(pressed===space){
+            if (pressed === space) {
                 evaluate_valves();
+            } else {
+                var num_pressed;
+
+                if ([49, 77, 109].indexOf(pressed) !== -1) {
+                    num_pressed = 1;
+                } else if ([50, 75, 107].indexOf(pressed) !== -1) {
+                    num_pressed = 2;
+                } else if ([51, 79, 111].indexOf(pressed) !== -1) {
+                    num_pressed = 3;
+                } else {
+                    throw 'error with key to valve mapping: ' + pressed;
+                }
+
+                var current_valve = $('#valve_' + num_pressed.toString());
+
+                switch (event.type) {
+                    case 'keyup':
+                        current_valve.removeClass('active');
+                        break;
+                    case 'keydown':
+                        current_valve.addClass('active');
+                        break;
+                    default:
+                        throw 'issue with key event type: ' + event.type;
+                }
+
             }
-            else {
-                var num_pressed = pressed - 48;
-                $('#valve_' + num_pressed.toString()).toggleClass('active');
-            }
-        });
+        }
 
         $('#valves_selected').click(evaluate_valves);
 
-        function evaluate_valves () {
-            if(!visible) return;
-            var selected = my_valves.filter(function(my_valve){
-                return $('#valve_' + my_valve).hasClass('active')? my_valve: '';
+        function evaluate_valves() {
+            if (!visible) return;
+            var selected = my_valves.filter(function (my_valve) {
+                return $('#valve_' + my_valve).hasClass('active') ? my_valve : '';
             });
             if (api.answer) api.answer(selected.join(''));
         }
 
-        api.all_up = function(){
-            my_valves.map(function(my_valve){
+        api.all_up = function () {
+            my_valves.map(function (my_valve) {
                 $('#valve_' + my_valve).removeClass('active');
             });
         }
         api.flare = function (fingering_str, flare_cls, dur, callback) {
-            var fingering = fingering_str.split('').map(function(el){
+            var fingering = fingering_str.split('').map(function (el) {
                 return '#valve_' + el;
             });
 
             fingering.push('#valves_selected');
 
-            fingering.forEach(function(el){
+            fingering.forEach(function (el) {
                 $(el).addClass(flare_cls);
             });
 
             setTimeout(function () {
-                fingering.forEach(function(el){
-                     $(el).removeClass(flare_cls);
+                fingering.forEach(function (el) {
+                    $(el).removeClass(flare_cls);
                 });
                 callback();
             }, dur);
