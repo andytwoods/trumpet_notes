@@ -5,7 +5,7 @@ function notation_manager() {
 
 // adapted from https://jsfiddle.net/ncda8ywh/1/
     var Note = function (options) {
-
+        options['auto_stem'] =  true;
         this.StaveNote = new Vex.Flow.StaveNote(options);
         this.removed = false;
         /**
