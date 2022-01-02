@@ -27,9 +27,9 @@ function elements_manager() {
         api.flare = function (note, flare_cls, dur, callback) {
             var safe_note_id = get_id_safe_note(note);
             var b = $('#buttonnote_' + safe_note_id);
-            b.addClass(flare_cls);
+            b.addClass([flare_cls, 'text-white']);
             setTimeout(function () {
-                b.removeClass(flare_cls);
+                b.removeClass([flare_cls, 'text-white']);
                 callback();
             }, dur)
         }
@@ -55,6 +55,8 @@ function elements_manager() {
         var valves = $('#valves');
         var valves_container = $('#valves_container');
 
+        var answer_btn_txt = 'Answer';
+
         var my_valves = ['1', '2', '3'];
 
         for (var valve of my_valves) {
@@ -63,7 +65,7 @@ function elements_manager() {
         }
 
         $(valves_container).append('<div class="text-center d-block mt-3"><button type="button" id="valves_selected" class="btn btn-outline-primary btn-lg ' +
-            'raised">Answer</button></div>');
+            'raised">'+answer_btn_txt+'</button></div>');
 
         $(valves_container).append('<small class="text-center d-block mt-3">Press 1/2/3 or m/k/o to select valves. Space to answer.</small>');
 
@@ -122,21 +124,29 @@ function elements_manager() {
                 $('#valve_' + my_valve).removeClass('active');
             });
         }
-        api.flare = function (fingering_str, flare_cls, dur, callback) {
-            var fingering = fingering_str.split('').map(function (el) {
+        api.flare = function (fingering_current, fingering_arr, flare_cls, dur, callback) {
+            var fingering = fingering_current.split('').map(function (el) {
                 return '#valve_' + el;
             });
+
+            var answer_btn = $('#valves_selected');
+
+            var answer_text = fingering_arr.map(function(el){
+               return el.length===0?'-': el;
+            }).join(', ');
+            answer_btn.text(answer_text).addClass('text-white');
 
             fingering.push('#valves_selected');
 
             fingering.forEach(function (el) {
-                $(el).addClass(flare_cls);
+                $(el).addClass([flare_cls, 'text-white']);
             });
 
             setTimeout(function () {
                 fingering.forEach(function (el) {
-                    $(el).removeClass(flare_cls);
+                    $(el).removeClass([flare_cls, 'text-white']);
                 });
+                answer_btn.text(answer_btn_txt).removeClass('text-white');
                 callback();
             }, dur);
         }

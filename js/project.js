@@ -49,14 +49,26 @@ function main() {
                 addNote(word.note + '/' + word.octave);
                 elements.VALVES.answer = function(response){
                     elements.VALVES.answer = undefined;
-                    var correct = word.fingering === response;
+                    var fingering = _.clone(word.fingering);
+                    var correct = fingering.indexOf(response)!==-1;
                     var dur = correct? 800:1000;
                     var col_class = correct?'correct-key':'wrong-key';
                     elements.VALVES.all_up();
-                    elements.VALVES.flare(word.fingering, col_class, dur, function(){
-                        trial.result(correct);
-                        run_trial(trial);
-                    });
+
+                    function do_flare(current_fingering_i) {
+                        var current_fingering = fingering[current_fingering_i];
+                        var last = fingering.length === current_fingering_i + 1;
+                        elements.VALVES.flare(current_fingering, fingering, col_class, dur, function () {
+                            if(last) {
+                                trial.result(correct);
+                                run_trial(trial);
+                            }
+                            else{
+                                do_flare(current_fingering_i + 1);
+                            }
+                        });
+                    }
+                    do_flare(0);
                 }
                 break;
             case NOTES_TO_SOUND:
