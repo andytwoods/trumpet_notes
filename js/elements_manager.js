@@ -58,8 +58,7 @@ function elements_manager() {
         var my_valves = ['1', '2', '3'];
 
         for (var valve of my_valves) {
-            $(valves).append('<button type="button" id="valve_' + valve + '" class="btn btn-outline-primary raised valve-buttons ' +
-                'd-block d-md-inline-block" style="margin: 0 auto;" data-bs-toggle="button" autocomplete="off">'
+            $(valves).append('<button type="button" id="valve_' + valve + '" class="btn btn-outline-primary raised valve-buttons align-self-center data-bs-toggle="button" autocomplete="off">'
                 + valve + '</button>');
         }
 
